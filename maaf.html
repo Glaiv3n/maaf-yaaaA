@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>.</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        animation: bgAnimation 20s ease-in-out infinite alternate;
+        color: #ecf0f1;
+    }
+
+    @keyframes bgAnimation {
+        0% { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        50% { background: linear-gradient(135deg, #1c1c2e, #2a2a3f); }
+        100% { background: linear-gradient(135deg, #2c3e50, #34495e); }
+    }
+
+    .container, #startScreen {
+        text-align: center;
+    }
+
+    .slide {
+        font-size: 1.8em;
+        line-height: 1.6;
+        padding: 40px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        width: 80%;
+        min-height: 150px;
+        margin: auto;
+        position: relative;
+    }
+
+    .word {
+        opacity: 0;
+        display: inline-block;
+        transition: opacity 0.8s ease; /* fade-in */
+        white-space: pre;
+    }
+
+    .next-note {
+        font-size: 0.6em;
+        margin-top: 10px;
+        color: #bdc3c7;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background-color: #34495e;
+        color: #ecf0f1;
+        cursor: pointer;
+        margin-top: 20px;
+        display: none;
+    }
+
+    button:hover {
+        background-color: #1abc9c;
+    }
+
+    #startScreen button {
+        display: inline-block;
+        font-size: 2em;
+        padding: 20px 40px;
+        cursor: pointer;
+    }
+
+    audio { display: none; }
+</style>
+</head>
+<body>
+<div id="startScreen">
+    <button id="startBtn">Dibaca Yaaa</button>
+</div>
+
+<div class="container" style="display:none;">
+    <div class="slide" id="slide"></div>
+    <div class="next-note" id="note">Mohon Di Baca By Fadlan</div>
+    <button id="nextBtn">Next</button>
+</div>
+
+<audio id="musik" loop>
+    <source src="musik.mp3" type="audio/mpeg">
+    Browser tidak mendukung audio.
+</audio>
+
+<script>
+const slides = [
+    { text: "Halo Quinsha Latifa Azalia 👋.", bg: "#2c3e50" },
+    { text: "Aku mau jujur sama kamu. Aku ngerasa kita perlu break dulu dari hubungan ini. Bukan karena aku nggak sayang atau nggak peduli sama kamu, tapi kondisi finansial aku belum siap buat ngejalanin hubungan dengan stabil 😓.", bg: "#34495e" },
+    { text: "Aku ngerti ini mungkin bikin kamu kecewa, dan aku bener-bener minta maaf. Perasaanku ke kamu tulus banget, tapi aku pengen semua langkah kita ke depan bisa dijalanin dengan lebih siap, terutama dari sisi ekonomi. 🫂🫂", bg: "#2c3e50" },
+    { text: "Aku harap kamu bisa ngerti dan nerima keputusan ini. Semoga nanti kita bisa ketemu lagi dalam keadaan yang lebih baik, dan bisa bikin hubungan yang lebih stabil. Makasih banget buat semua momen berharga yang udah kita lalui bareng ❤.", bg: "#34495e" },
+    { text: "Makasih yaa Quinsha udah dengerin ini semua, semoga kita bisa ketemu lagi di waktu yang tepat. Jaga diri baik-baik yaa!, i love u sm:3", bg: "#2c3e50" }
+];
+
+const slideDiv = document.getElementById("slide");
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
+const container = document.querySelector(".container");
+const musik = document.getElementById("musik");
+const nextBtn = document.getElementById("nextBtn");
+
+let index = 0;
+
+// hitung total kata untuk durasi ±3 menit
+let totalWords = slides.reduce((sum, s) => sum + s.text.split(" ").length, 0);
+let totalDurationMs = 29500; // 3 menit
+let wordDelay = totalDurationMs / totalWords; // delay per kata (ms)
+
+function showSlide(i) {
+    slideDiv.innerHTML = "";
+    nextBtn.style.display = "none";
+    document.body.style.backgroundColor = slides[i].bg;
+    const words = slides[i].text.split(" ");
+    let wordIndex = 0;
+
+    function showNextWord() {
+        if(wordIndex < words.length){
+            const span = document.createElement("span");
+            span.textContent = words[wordIndex] + " ";
+            span.className = "word";
+            slideDiv.appendChild(span);
+            setTimeout(() => { span.style.opacity = 1; }, 50);
+            wordIndex++;
+            setTimeout(showNextWord, wordDelay);
+        } else {
+            // semua kata muncul, tampilkan tombol next
+            nextBtn.style.display = "inline-block";
+        }
+    }
+
+    showNextWord();
+}
+
+startBtn.addEventListener("click", () => {
+    startScreen.style.display = "none";
+    container.style.display = "block";
+    musik.play().catch(e => console.log("Autoplay diblokir:", e));
+    showSlide(index);
+});
+
+nextBtn.addEventListener("click", () => {
+    index++;
+    if(index < slides.length) {
+        showSlide(index);
+    } else {
+        nextBtn.style.display = "none"; // jika sudah slide terakhir
+    }
+});
+</script>
+</body>
+</html>
